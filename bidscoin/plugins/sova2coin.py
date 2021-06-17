@@ -73,14 +73,7 @@ def bidsmapper_plugin(session: Path, bidsmap_new: dict, bidsmap_old: dict, templ
         return
 
     # Collect the different EEG source files for all runs in the session
-    sourcefiles = []
-    if dataformat == 'EEG':
-        for sourcedir in bidscoin.lsdirs(session):
-            sourcefile = get_eegfile(sourcedir)
-            if sourcefile.name:
-                sourcefiles.append(sourcefile)
-    else:
-        LOGGER.exception(f"Unsupported dataformat '{dataformat}'")
+    sourcefiles = [sourcefile for sourcefile in session.rglob('*') if is_sourcefile(sourcefile)]
 
     # Update the bidsmap with the info from the source files
     for sourcefile in sourcefiles:
@@ -91,6 +84,9 @@ def bidsmapper_plugin(session: Path, bidsmap_new: dict, bidsmap_old: dict, templ
             return
 
         datasource = bids.DataSource(sourcefile, plugin, dataformat)
+
+        if not datasource.is_datasource():
+            continue
 
         # See if we can find a matching run in the old bidsmap
         run, index = bids.get_matching_run(datasource, bidsmap_old)

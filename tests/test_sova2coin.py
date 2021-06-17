@@ -16,7 +16,11 @@ folder = session_path
 wildcard='*'
 [fname for fname in sorted(folder.glob(wildcard)) if fname.is_dir() and not fname.name.startswith('.')]
 
-bidsmap, yamlfile = load_bidsmap(Path(r'Y:\code\bidscoin\bidscoin\heuristics\bidsmap_sovabids.yaml'))
-bidsmapper_plugin(session=session_path, bidsmap_new=bidsmap, bidsmap_old=bidsmap, template=bidsmap, store=bidsmap)
+templatefile = Path(r'Y:\code\bidscoin\bidscoin\heuristics\bidsmap_sovabids.yaml')
+template, _              = load_bidsmap(templatefile)
 
 
+bidsmapper_plugin(session=session_path, bidsmap_new={}, bidsmap_old={}, template=template, store=True)
+
+
+#bidsmapper Y:\code\sovabids\_data\lemon2\ Y:\code\sovabids\_data\lemon2_bids -t bidsmap_sovabids

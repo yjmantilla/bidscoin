@@ -116,6 +116,6 @@ EEG:
       run: <<1>>                  # This will be updated during bidscoiner runtime (as it depends on the already existing files)
       suffix: eeg
     meta:                         # This is an optional entry for meta-data dictionary that will be appended to the json sidecar files produced by dcm2niix
-      SamplingFrequency: <<sidecar.SamplingFrequency>>
-      PowerLineFrequency: <<sidecar.PowerLineFrequency>>
-      RecordingDuration: <<sidecar.RecordingDuration>>
+      SamplingFrequency: <sidecar.SamplingFrequency>
+      PowerLineFrequency: <sidecar.PowerLineFrequency>
+      RecordingDuration: <sidecar.RecordingDuration>

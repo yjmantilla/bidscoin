@@ -2,8 +2,8 @@ from bidscoin.plugins.sova2coin import is_eeg,is_sourcefile,get_eegfield,get_att
 from pathlib import Path
 from bidscoin.bids import load_bidsmap
 from bidscoin.bidscoin import lsdirs
-p = Path(r"Y:\code\sovabids\_data\lemon2\sub-010003\ses-001\sub-010003.vhdr")
-pnot = Path(r"Y:\code\sovabids\_data\lemon2\sub-010003\ses-001\sub-010003.eeg")
+p = Path(r"Y:\code\sovabids\_data\lemon2\sub-010003\ses-001\resting\sub-010003.vhdr")
+pnot = Path(r"Y:\code\sovabids\_data\lemon2\sub-010003\ses-001\resting\sub-010003.eeg")
 
 assert is_sourcefile(p)=='EEG'
 assert is_sourcefile(pnot)==''
@@ -20,7 +20,7 @@ templatefile = Path(r'Y:\code\bidscoin\bidscoin\heuristics\bidsmap_sovabids.yaml
 template, _              = load_bidsmap(templatefile)
 
 
-bidsmapper_plugin(session=session_path, bidsmap_new={}, bidsmap_old={}, template=template, store=True)
+bidsmapper_plugin(session=session_path, bidsmap_new=template, bidsmap_old={}, template=template, store=True)
 
 
 #bidsmapper Y:\code\sovabids\_data\lemon2\ Y:\code\sovabids\_data\lemon2_bids -t bidsmap_sovabids

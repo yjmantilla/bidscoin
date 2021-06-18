@@ -31,7 +31,9 @@ Options:
       args: -b y -z y -i n        # Argument string that is passed to dcm2niix. Tip: SPM users may want to use '-z n' (which produces unzipped nifti's, see dcm2niix -h for more information)
     phys2bidscoin:                # The settings for the phys2bidscoin plugin
     sova2coin:            #module add sovabids #
-
+      rules_file : Y:\code\bidscoin\bidscoin\heuristics\sovabids_rules.yaml
+      non-bids:
+        path_pattern : /%ignore%/ses-%entities.session%/%entities.task%/sub-%entities.subject%.vhdr #USE POSIX
 Physio:
 # --------------------------------------------------------------------------------
 # Physio key-value heuristics (phys2bids -info data) that are mapped to the BIDS labels)
@@ -90,8 +92,8 @@ EEG:
 # --------------------------------------------------------------------------------
 # Physio key-value heuristics (phys2bids -info data) that are mapped to the BIDS labels)
 # --------------------------------------------------------------------------------
-  subject: <<SourceFilePath>>     # <<SourceFilePath>> extracts the subject label from the source directory during bidscoiner runtime
-  session: <<SourceFilePath>>     # <<SourceFilePath>> extracts the session label from the source directory during bidscoiner runtime
+  subject: <<entities.subject>> #<<PathPattern>>     # <<SourceFilePath>> extracts the subject label from the source directory during bidscoiner runtime
+  session: <<entities.session>> #ses-%session%\%task%\sub-%subject%.vhdr     # <<SourceFilePath>> extracts the session label from the source directory during bidscoiner runtime
 
   eeg:        # ----------------------- All behavioural runs --------------------
   - provenance:                   # The fullpath name of the source file from which the attributes are read. Serves also as a look-up key to find a run in the bidsmap
@@ -101,16 +103,19 @@ EEG:
       size:                       # File size, e.g. "2[4-6]\d MB" for matching files between 240-269 MB
       nrfiles:                    # Number of files in the folder that match the above criteria, e.g. "5/d/d" for matching a number between 500-599
     attributes:                   # The matching (regexp) criteria for the phys2bids -info data go in here
-      SamplingFrequency:
-      PowerLineFrequency:
-      RecordingDuration:
+      sidecar.SamplingFrequency:
+      sidecar.PowerLineFrequency:
+      sidecar.RecordingDuration:
+      entities.subject:
+      entities.task:
+      entities.session:
     bids:
-      task: 
-      acq:
+      task: <entities.task> #why is it that i need single for it to work
+      acq: 
       recording:
       run: <<1>>                  # This will be updated during bidscoiner runtime (as it depends on the already existing files)
       suffix: eeg
     meta:                         # This is an optional entry for meta-data dictionary that will be appended to the json sidecar files produced by dcm2niix
-      SamplingFrequency: <<SamplingFrequency>>
-      PowerLineFrequency: <<PowerLineFrequency>>
-      RecordingDuration: <<RecordingDuration>>
+      SamplingFrequency: <<sidecar.SamplingFrequency>>
+      PowerLineFrequency: <<sidecar.PowerLineFrequency>>
+      RecordingDuration: <<sidecar.RecordingDuration>>

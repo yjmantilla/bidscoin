@@ -18,6 +18,8 @@ from nibabel.parrec import parse_PAR_header
 from distutils.dir_util import copy_tree
 from typing import Union, List, Tuple
 from pathlib import Path
+
+from sovabids.utils import parse_string_from_template
 try:
     from bidscoin import bidscoin, dicomsort
 except ImportError:
@@ -129,7 +131,11 @@ class DataSource:
         for plugin, options in self.plugins.items():
             module = bidscoin.import_plugin(plugin, ('get_attribute',))
             if module:
-                attributeval = module.get_attribute(self.dataformat, self.path, attributekey)
+                if module.get_attribute.__code__.co_argcount == 4:
+                    attributeval = module.get_attribute(self.dataformat, self.path, attributekey,self.plugins)
+                else:
+                    attributeval = module.get_attribute(self.dataformat, self.path, attributekey)
+
                 if attributeval:
                     if validregexp:
                         try:            # Strip meta-characters to prevent match_attribute() errors
@@ -150,6 +156,15 @@ class DataSource:
         """
 
         # Add default value for subid and sesid (e.g. for the bidseditor)
+        if subid == "<<PathPattern>>":
+            # assume sesid has the rule
+            result = parse_string_from_template(self.path.__str__(),sesid)
+            if 'subject' not in result or 'session' not in result:
+                LOGGER.error(f"Could not parse sub/ses-id information from '{self.path.parent}'")
+                return '', ''
+            LOGGER.info(f"parsed: {result} from {self.path.__str__()}")
+            subid = result['subject']
+            sesid = result['session']
         if subid == '<<SourceFilePath>>':
             subid = [part for part in self.path.parent.parts if part.startswith(self.subprefix)][-1]
         else:
@@ -165,6 +180,8 @@ class DataSource:
                 sesid = ''
         else:
             sesid = self.dynamicvalue(sesid, runtime=True)
+
+
 
         # Add sub- and ses- prefixes if they are not there
         subid = 'sub-' + cleanup_value(re.sub(f'^{self.subprefix}', '', subid))

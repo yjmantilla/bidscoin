@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import Union
 from typing import Union, List, Tuple
 from pathlib import Path
-
-from sovabids.utils import get_supported_extensions,mne_open
+from sovabids.apply_rules import load_rules,get_info_from_path
+from sovabids.utils import deep_merge,deep_merge_N, flatten,get_supported_extensions,mne_open,parse_string_from_template
 try:
     from bidscoin import bidscoin, bids
 except ImportError:
@@ -29,19 +29,34 @@ def is_sourcefile(file: Path) -> str:
 def is_eeg(file):
     if file.suffix in get_supported_extensions():
         return True
-def get_eegfield(attribute,sourcefile):
+def get_eegfield(attribute,sourcefile,opt=None):
+    opt = opt['sova2coin']
+    #print('opt',opt)
+    rules = {}
+    if opt is not None:
+        if 'rules_file' in opt:
+            rules = load_rules(opt['rules_file'])
+            rules = deep_merge(rules,opt)
+            #print('rules',rules)
+        #print(sourcefile.as_posix())
+        info_path = get_info_from_path(sourcefile.as_posix(),rules)
+        
+        #print('info_path',info_path,sourcefile.__str__())
     # Upon reading RAW MNE makes the assumptions
     raw = mne_open(sourcefile.__str__() 
 )
+    rules = flatten(info_path)
+    #print('flat_rules',rules)
     switcher = {
-        'SamplingFrequency': raw.info['sfreq'],
-        'PowerLineFrequency':('n/a' if raw.info['line_freq'] is None else
-                              raw.info['line_freq']),
-        'RecordingDuration':raw.times[-1],
+        'sidecar.SamplingFrequency': float(raw.info['sfreq']),
+        'sidecar.PowerLineFrequency':('n/a' if raw.info['line_freq'] is None else
+                              float(raw.info['line_freq'])),
+        'sidecar.RecordingDuration':float(raw.times[-1]),
     }
+    switcher.update(rules)
     return switcher.get(attribute, "n/a")
 
-def get_attribute(dataformat: str, sourcefile: Path, attribute: str) -> Union[str, int]:
+def get_attribute(dataformat: str, sourcefile: Path, attribute: str,opt:dict=None) -> Union[str, int]:
     """
     This plugin function supports reading attributes from DICOM and PAR dataformats
     :param dataformat:  The bidsmap-dataformat of the sourcefile, e.g. DICOM of PAR
@@ -49,9 +64,8 @@ def get_attribute(dataformat: str, sourcefile: Path, attribute: str) -> Union[st
     :param attribute:   The attribute key for which the value should be read
     :return:            The attribute value
     """
-
     if dataformat == 'EEG':
-        return get_eegfield(attribute, sourcefile)
+        return get_eegfield(attribute, sourcefile,opt)
 
 
 def bidsmapper_plugin(session: Path, bidsmap_new: dict, bidsmap_old: dict, template: dict, store: dict) -> None:

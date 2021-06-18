@@ -158,7 +158,10 @@ class DataSource:
         # Add default value for subid and sesid (e.g. for the bidseditor)
         if subid == "<<PathPattern>>":
             # assume sesid has the rule
-            result = parse_string_from_template(self.path.__str__(),sesid)
+            if sesid.count('%') != 0 and sesid.count('%') % 2 == 0:
+                result = parse_string_from_template(self.path.__str__(),sesid)
+            else:
+                result = {}
             if 'subject' not in result or 'session' not in result:
                 LOGGER.error(f"Could not parse sub/ses-id information from '{self.path.parent}'")
                 return '', ''

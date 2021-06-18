@@ -93,7 +93,7 @@ EEG:
 # Physio key-value heuristics (phys2bids -info data) that are mapped to the BIDS labels)
 # --------------------------------------------------------------------------------
   subject: <<entities.subject>> #<<PathPattern>>     # <<SourceFilePath>> extracts the subject label from the source directory during bidscoiner runtime
-  session: <<entities.session>> #ses-%session%\%task%\sub-%subject%.vhdr     # <<SourceFilePath>> extracts the session label from the source directory during bidscoiner runtime
+  session: <<entities.session>> #sub-%subject%/ses-%session%/%task%/%ignore%     # <<SourceFilePath>> extracts the session label from the source directory during bidscoiner runtime
 
   eeg:        # ----------------------- All behavioural runs --------------------
   - provenance:                   # The fullpath name of the source file from which the attributes are read. Serves also as a look-up key to find a run in the bidsmap
@@ -110,12 +110,9 @@ EEG:
       entities.task:
       entities.session:
     bids:
-      task: <entities.task> #why is it that i need single for it to work
+      task: <<entities.task>> #why is it that i need single for it to work
       acq: 
       recording:
       run: <<1>>                  # This will be updated during bidscoiner runtime (as it depends on the already existing files)
       suffix: eeg
-    meta:                         # This is an optional entry for meta-data dictionary that will be appended to the json sidecar files produced by dcm2niix
-      SamplingFrequency: <sidecar.SamplingFrequency>
-      PowerLineFrequency: <sidecar.PowerLineFrequency>
-      RecordingDuration: <sidecar.RecordingDuration>
+    meta:                         # This is an optional entry for meta-data dictionary that will be appended to the json sidecar files produced by mne-bids

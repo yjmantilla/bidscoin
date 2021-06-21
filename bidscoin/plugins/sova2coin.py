@@ -185,8 +185,6 @@ def bidscoiner_plugin(session: Path, bidsmap: dict, bidsfolder: Path, personals:
     if not subid:
         return
     LOGGER.info(f'Using subid: {subid} and sesid {sesid} for {session} -> {bidsfolder}')
-    dummy = len(bidsmap[dataformat]['eeg'])#[1]#formatData(bidsmap)#list(bidsmap['EEG']['eeg'].keys())
-    LOGGER.info(f'HEY: {dummy}')
 
         # Process all the source files or run subfolders
     sourcefile = Path()

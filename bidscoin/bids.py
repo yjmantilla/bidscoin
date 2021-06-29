@@ -19,7 +19,7 @@ from distutils.dir_util import copy_tree
 from typing import Union, List, Tuple
 from pathlib import Path
 
-from sovabids.utils import parse_string_from_template
+from sovabids.parsers import parse_string_from_template
 try:
     from bidscoin import bidscoin, dicomsort
 except ImportError:

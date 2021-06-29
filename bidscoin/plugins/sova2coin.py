@@ -6,7 +6,8 @@ from typing import Union, List, Tuple
 from pathlib import Path
 import mne
 from sovabids.apply_rules import load_rules,get_info_from_path
-from sovabids.utils import mne_open,deep_merge,deep_merge_N, flatten,get_supported_extensions,mne_open,parse_string_from_template
+from sovabids.utils import mne_open,deep_merge,deep_merge_N, flatten,get_supported_extensions,mne_open
+
 from collections import OrderedDict
 from ruamel.yaml.comments import CommentedMap,CommentedSeq
 from mne_bids import write_raw_bids,BIDSPath

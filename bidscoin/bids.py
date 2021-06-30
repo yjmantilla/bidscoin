@@ -19,7 +19,8 @@ from distutils.dir_util import copy_tree
 from typing import Union, List, Tuple
 from pathlib import Path
 
-from sovabids.parsers import parse_string_from_template
+from sovabids.parsers import parse_from_placeholder
+
 try:
     from bidscoin import bidscoin, dicomsort
 except ImportError:
@@ -159,7 +160,7 @@ class DataSource:
         if subid == "<<PathPattern>>":
             # assume sesid has the rule
             if sesid.count('%') != 0 and sesid.count('%') % 2 == 0:
-                result = parse_string_from_template(self.path.__str__(),sesid)
+                result = parse_from_placeholder(self.path.__str__(),sesid)
             else:
                 result = {}
             if 'subject' not in result or 'session' not in result:

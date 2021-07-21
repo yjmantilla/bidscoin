@@ -9,10 +9,11 @@ This module contains the interface with sovabids, both for the bidsmapper and fo
 
 """
 
-from sovabids.utils import get_supported_extensions,flatten
+from sovabids.settings import SUPPORTED_EXTENSIONS,SOVABIDS_PATH
+from sovabids.dicts import flatten
 from sovabids.rules import apply_rules_to_single_file,load_rules
-from sovabids.convert import update_dataset_description
-from sovabids import __path__ as sovapath
+from sovabids.bids import update_dataset_description
+
 # TODO: Handle sovabids import errors gracefully
 try:
     from bidscoin import bids
@@ -50,7 +51,7 @@ def is_sourcefile(file: Path) -> str:
     :return:        The valid / supported dataformat of the sourcefile
     """
 
-    if file.suffix in get_supported_extensions():
+    if file.suffix in SUPPORTED_EXTENSIONS:
         return 'EEG'
 
     return ''
@@ -71,7 +72,7 @@ def get_attribute(dataformat: str, sourcefile: Path, attribute: str, options: di
         LOGGER.debug(f'This is the sova2coin-plugin get_attribute routine, reading the {dataformat} "{attribute}" attribute value from "{sourcefile}"')
     else:
         return ''
-    temp_folder = os.path.join(sovapath[0],'_temp')
+    temp_folder = os.path.join(SOVABIDS_PATH,'_temp')
     _,sova_info = apply_rules_to_single_file(sourcefile._str,options.get('rules',{}),temp_folder,write=False,preview=True)
     sova_info = flatten(sova_info)
     shutil.rmtree(temp_folder)
@@ -81,11 +82,11 @@ def get_attribute(dataformat: str, sourcefile: Path, attribute: str, options: di
 
 def bidsmapper_plugin(session: Path, bidsmap_new: dict, bidsmap_old: dict, template: dict, store: dict) -> None:
     """
-    All the heuristics format phys2bids attributes and properties onto bids labels and meta-data go into this plugin function.
+    All the heuristics format sovabids attributes and properties onto bids labels and meta-data go into this plugin function.
     The function is expected to update / append new runs to the bidsmap_new data structure. The bidsmap options for this plugin
     are stored in:
 
-    bidsmap_new['Options']['plugins']['phys2bidscoin']
+    bidsmap_new['Options']['plugins']['sova2coin']
 
     See also the dcm2bidsmap plugin for reference implementation
 
